@@ -16,8 +16,8 @@ const TABS = [
 export default function Layout({ children, tab, setTab }: Props) {
   return (
     <div className="min-h-screen bg-stone-50 flex flex-col items-center">
-      <div className="w-full max-w-4xl flex flex-col min-h-screen">
-        <main className="flex-1 px-5 py-6">
+      <div className="w-full flex flex-col min-h-screen">
+        <main className="flex-1 px-10 py-6 max-w-6xl mx-auto w-full">
           {children}
         </main>
 
