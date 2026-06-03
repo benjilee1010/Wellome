@@ -127,7 +127,7 @@ export default function RulesPage() {
             const myRemoveVote = rule.votes_reject.includes(user?.id ?? '')
             return (
               <div key={rule.id} className="bg-white rounded-xl border border-stone-200 p-4 flex items-start gap-3">
-                <span className="text-teal-500 mt-0.5 text-lg">✓</span>
+                <span className="w-2 h-2 rounded-full bg-teal-400 mt-1.5 flex-shrink-0"></span>
                 <div className="flex-1">
                   <p className="text-sm text-stone-700">{rule.text}</p>
                   <p className="text-xs text-stone-400 mt-1">Remove: {rule.votes_reject.length}/{members.length} votes needed</p>

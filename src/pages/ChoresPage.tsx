@@ -106,7 +106,7 @@ export default function ChoresPage() {
           onClick={() => toggleComplete(chore)}
           className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors ${chore.completed ? 'bg-teal-500 border-teal-500' : 'border-stone-300 hover:border-teal-400'}`}
         >
-          {chore.completed && <span className="text-white text-xs">✓</span>}
+          {chore.completed && <span className="text-white text-xs font-bold">✔</span>}
         </button>
         <div className="flex-1 min-w-0">
           <p className={`text-sm font-medium ${chore.completed ? 'line-through text-stone-400' : 'text-stone-800'}`}>
@@ -124,7 +124,7 @@ export default function ChoresPage() {
             )}
           </div>
         </div>
-        <button onClick={() => deleteChore(chore.id)} className="text-stone-200 hover:text-red-400 text-sm transition-colors">✕</button>
+        <button onClick={() => deleteChore(chore.id)} className="text-xs text-stone-300 hover:text-red-400 transition-colors">Delete</button>
       </div>
     )
   }
@@ -133,9 +133,9 @@ export default function ChoresPage() {
     <div className="space-y-5">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <button onClick={() => setWeekOffset(o => o - 1)} className="p-1 hover:bg-stone-100 rounded-lg text-stone-500">←</button>
+          <button onClick={() => setWeekOffset(o => o - 1)} className="px-2 py-1 hover:bg-stone-100 rounded-lg text-stone-500 text-sm font-medium">Prev</button>
           <span className="font-semibold text-stone-700 text-sm">{weekLabel(weekMonday)}</span>
-          <button onClick={() => setWeekOffset(o => o + 1)} className="p-1 hover:bg-stone-100 rounded-lg text-stone-500">→</button>
+          <button onClick={() => setWeekOffset(o => o + 1)} className="px-2 py-1 hover:bg-stone-100 rounded-lg text-stone-500 text-sm font-medium">Next</button>
         </div>
         <button
           onClick={() => setShowAdd(true)}

@@ -93,9 +93,9 @@ export default function BillsPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <button onClick={prevMonth} className="p-1 hover:bg-stone-100 rounded-lg text-stone-500">←</button>
+          <button onClick={prevMonth} className="px-2 py-1 hover:bg-stone-100 rounded-lg text-stone-500 text-sm font-medium">Prev</button>
           <span className="font-semibold text-stone-700">{monthLabel(month)}</span>
-          <button onClick={nextMonth} className="p-1 hover:bg-stone-100 rounded-lg text-stone-500">→</button>
+          <button onClick={nextMonth} className="px-2 py-1 hover:bg-stone-100 rounded-lg text-stone-500 text-sm font-medium">Next</button>
         </div>
         <button
           onClick={() => setShowAdd(true)}
@@ -178,7 +178,7 @@ export default function BillsPage() {
                 onClick={() => deleteBill(bill.id)}
                 className="text-stone-300 hover:text-red-400 text-sm transition-colors"
               >
-                ✕
+                Delete
               </button>
             </div>
             <div className="space-y-2">
