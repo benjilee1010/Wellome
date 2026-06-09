@@ -19,7 +19,12 @@ const PAGE_TITLES: Record<string, string> = {
 function AppInner() {
   const { user, loading: authLoading } = useAuth()
   const { house, loading: houseLoading } = useHouse()
-  const [tab, setTab] = useState('bills')
+  const [tab, setTab] = useState(() => localStorage.getItem('activeTab') ?? 'bills')
+
+  const handleSetTab = (t: string) => {
+    localStorage.setItem('activeTab', t)
+    setTab(t)
+  }
 
   if (authLoading || houseLoading) {
     return (
@@ -33,7 +38,7 @@ function AppInner() {
   if (!house) return <OnboardingPage />
 
   return (
-    <Layout tab={tab} setTab={setTab}>
+    <Layout tab={tab} setTab={handleSetTab}>
       <div className="mb-5">
         <p className="text-xs font-semibold uppercase tracking-widest text-stone-400 mb-0.5">{house.name}</p>
         <h1 className="text-2xl font-bold text-stone-800">{PAGE_TITLES[tab]}</h1>

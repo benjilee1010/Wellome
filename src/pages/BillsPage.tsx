@@ -105,6 +105,36 @@ export default function BillsPage() {
         </button>
       </div>
 
+      {bills.length > 0 && (() => {
+        const totalCost = bills.reduce((sum, b) => sum + b.total_amount, 0)
+        const perPerson = members.length > 0 ? totalCost / members.length : 0
+        const myPaid = payments.filter(p => p.user_id === user?.id && p.paid).reduce((s, p) => s + p.amount, 0)
+        const myOwed = payments.filter(p => p.user_id === user?.id && !p.paid).reduce((s, p) => s + p.amount, 0)
+        return (
+          <div className="bg-teal-50 border border-teal-100 rounded-xl p-4 flex gap-4 text-center">
+            <div className="flex-1">
+              <p className="text-xs text-teal-500 font-medium mb-0.5">Total bills</p>
+              <p className="text-lg font-bold text-teal-700">${totalCost.toFixed(2)}</p>
+            </div>
+            <div className="w-px bg-teal-100" />
+            <div className="flex-1">
+              <p className="text-xs text-teal-500 font-medium mb-0.5">Per person</p>
+              <p className="text-lg font-bold text-teal-700">${perPerson.toFixed(2)}</p>
+            </div>
+            <div className="w-px bg-teal-100" />
+            <div className="flex-1">
+              <p className="text-xs text-teal-500 font-medium mb-0.5">You owe</p>
+              <p className={`text-lg font-bold ${myOwed > 0 ? 'text-red-500' : 'text-teal-700'}`}>${myOwed.toFixed(2)}</p>
+            </div>
+            <div className="w-px bg-teal-100" />
+            <div className="flex-1">
+              <p className="text-xs text-teal-500 font-medium mb-0.5">You paid</p>
+              <p className="text-lg font-bold text-teal-700">${myPaid.toFixed(2)}</p>
+            </div>
+          </div>
+        )
+      })()}
+
       {showAdd && (
         <div className="bg-white rounded-xl border border-stone-200 p-4 space-y-3">
           <h3 className="font-semibold text-stone-700 text-sm">New bill</h3>
