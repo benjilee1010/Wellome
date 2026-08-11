@@ -140,7 +140,7 @@ export default function ChoresPage() {
       <div>
         <p className="text-xs font-semibold uppercase tracking-widest text-stone-400 mb-2">{label}</p>
         <div className="grid grid-cols-7 gap-1.5">
-          {DAY_LABELS.map((dayLabel, i) => {
+          {DAY_LABELS.map((_dayLabel, i) => {
             const day = addDays(monday, i)
             const dayNum = day.getDate()
             const isToday = isoDate(day) === isoDate(today)
