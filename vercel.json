@@ -1,4 +1,14 @@
 {
   "crons": [{ "path": "/api/keep-alive", "schedule": "0 12 * * *" }],
-  "rewrites": [{ "source": "/((?!api/).*)", "destination": "/" }]
+  "rewrites": [{ "source": "/((?!api/).*)", "destination": "/" }],
+  "headers": [
+    {
+      "source": "/index.html",
+      "headers": [{ "key": "Cache-Control", "value": "no-store" }]
+    },
+    {
+      "source": "/assets/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+    }
+  ]
 }

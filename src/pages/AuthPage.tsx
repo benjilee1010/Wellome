@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { supabase } from '../lib/supabase'
+import { c, inputStyle } from '../lib/theme'
 
 export default function AuthPage() {
   const [email, setEmail] = useState('')
@@ -23,57 +24,34 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen bg-stone-50 flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4" style={{ background: c.bg }}>
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-stone-800 mb-1">Wellome</h1>
-          <p className="text-stone-500 text-sm">Roommate life, organised.</p>
+          <h1 className="text-4xl font-bold mb-1" style={{ color: c.text }}>Wellome</h1>
+          <p className="text-sm" style={{ color: c.textMuted }}>Roommate life, organised.</p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-stone-200 p-6">
-          <h2 className="text-lg font-semibold text-stone-700 mb-4">
+        <div className="rounded-2xl p-6" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
+          <h2 className="text-base font-semibold mb-4" style={{ color: c.text }}>
             {isSignUp ? 'Create account' : 'Sign in'}
           </h2>
 
           <form onSubmit={handleSubmit} className="space-y-3">
             <div>
-              <label className="block text-sm font-medium text-stone-600 mb-1">Email</label>
-              <input
-                type="email"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                required
-                className="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400"
-                placeholder="you@example.com"
-              />
+              <label className="block text-xs font-medium mb-1" style={{ color: c.textMuted }}>Email</label>
+              <input type="email" value={email} onChange={e => setEmail(e.target.value)} required style={inputStyle} placeholder="you@example.com" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-stone-600 mb-1">Password</label>
-              <input
-                type="password"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                required
-                className="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400"
-                placeholder="••••••••"
-              />
+              <label className="block text-xs font-medium mb-1" style={{ color: c.textMuted }}>Password</label>
+              <input type="password" value={password} onChange={e => setPassword(e.target.value)} required style={inputStyle} placeholder="••••••••" />
             </div>
-
-            {error && <p className="text-red-500 text-sm">{error}</p>}
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-teal-500 hover:bg-teal-600 text-white font-medium rounded-lg py-2 text-sm transition-colors disabled:opacity-50"
-            >
+            {error && <p className="text-sm" style={{ color: c.danger }}>{error}</p>}
+            <button type="submit" disabled={loading} className="w-full font-semibold rounded-lg py-2.5 text-sm disabled:opacity-50" style={{ background: c.accent, color: '#fff', border: 'none', cursor: 'pointer' }}>
               {loading ? 'Loading…' : isSignUp ? 'Create account' : 'Sign in'}
             </button>
           </form>
 
-          <button
-            onClick={() => { setIsSignUp(!isSignUp); setError('') }}
-            className="mt-4 w-full text-sm text-stone-500 hover:text-stone-700 transition-colors"
-          >
+          <button onClick={() => { setIsSignUp(!isSignUp); setError('') }} className="mt-4 w-full text-sm" style={{ color: c.textMuted, background: 'none', border: 'none', cursor: 'pointer' }}>
             {isSignUp ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
           </button>
         </div>

@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase'
 import { useHouse } from '../context/HouseContext'
 import { useAuth } from '../context/AuthContext'
 import { type HouseRule } from '../lib/types'
+import { c, card, inputStyle } from '../lib/theme'
 
 export default function RulesPage() {
   const { house, members } = useHouse()
@@ -23,18 +24,8 @@ export default function RulesPage() {
   const proposeRule = async () => {
     if (!house || !user || !newRule.trim()) return
     setLoading(true)
-    await supabase.from('house_rules').insert({
-      house_id: house.id,
-      text: newRule.trim(),
-      proposed_by: user.id,
-      status: 'pending',
-      votes_approve: [user.id],
-      votes_reject: [],
-    })
-    setNewRule('')
-    setShowAdd(false)
-    setLoading(false)
-    load()
+    await supabase.from('house_rules').insert({ house_id: house.id, text: newRule.trim(), proposed_by: user.id, status: 'pending', votes_approve: [user.id], votes_reject: [] })
+    setNewRule(''); setShowAdd(false); setLoading(false); load()
   }
 
   const vote = async (rule: HouseRule, approve: boolean) => {
@@ -44,26 +35,19 @@ export default function RulesPage() {
     let votesReject = rule.votes_reject.filter(v => v !== uid)
     if (approve) votesApprove = [...votesApprove, uid]
     else votesReject = [...votesReject, uid]
-
     const threshold = Math.ceil(members.length * 0.75)
     let status: 'pending' | 'approved' | 'rejected' = 'pending'
     if (votesApprove.length >= threshold) status = 'approved'
     else if (votesReject.length > members.length - threshold) status = 'rejected'
-
-    await supabase.from('house_rules').update({
-      votes_approve: votesApprove,
-      votes_reject: votesReject,
-      status,
-    }).eq('id', rule.id)
+    await supabase.from('house_rules').update({ votes_approve: votesApprove, votes_reject: votesReject, status }).eq('id', rule.id)
     load()
   }
 
-  const removeRule = async (rule: HouseRule) => {
+  const removeVote = async (rule: HouseRule) => {
     if (!user) return
     const uid = user.id
-    let votesApprove = rule.votes_approve.filter(v => v !== uid)
-    let votesReject = [...rule.votes_reject.filter(v => v !== uid), uid]
-
+    const votesApprove = rule.votes_approve.filter(v => v !== uid)
+    const votesReject = [...rule.votes_reject.filter(v => v !== uid), uid]
     if (votesReject.length >= members.length) {
       await supabase.from('house_rules').delete().eq('id', rule.id)
     } else {
@@ -74,51 +58,29 @@ export default function RulesPage() {
 
   const approvedRules = rules.filter(r => r.status === 'approved')
   const pendingRules = rules.filter(r => r.status === 'pending')
-
   const threshold = members.length > 0 ? Math.ceil(members.length * 0.75) : 1
 
   return (
     <div className="space-y-5">
-      <div className="flex items-center justify-between">
-        <h2 className="font-semibold text-stone-700">House Rules</h2>
-        <button
-          onClick={() => setShowAdd(true)}
-          className="bg-teal-500 hover:bg-teal-600 text-white text-sm font-medium px-3 py-1.5 rounded-lg transition-colors"
-        >
+      <div className="flex justify-end">
+        <button onClick={() => setShowAdd(true)} style={{ background: c.accent, color: '#fff', border: 'none', cursor: 'pointer', borderRadius: '8px', padding: '8px 14px', fontSize: '13px', fontWeight: 600 }}>
           + Propose rule
         </button>
       </div>
 
       {showAdd && (
-        <div className="bg-white rounded-xl border border-stone-200 p-4 space-y-3">
-          <label className="text-sm font-medium text-stone-600 block">New rule</label>
-          <textarea
-            value={newRule}
-            onChange={e => setNewRule(e.target.value)}
-            rows={2}
-            className="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 resize-none"
-            placeholder="e.g. No dishes in the sink overnight."
-          />
+        <div style={card} className="space-y-3">
+          <label className="text-sm font-semibold block" style={{ color: c.text }}>New rule</label>
+          <textarea value={newRule} onChange={e => setNewRule(e.target.value)} rows={2} style={{ ...inputStyle, resize: 'none' }} placeholder="e.g. No dishes in the sink overnight." />
           <div className="flex gap-2">
-            <button
-              onClick={proposeRule}
-              disabled={loading || !newRule.trim()}
-              className="flex-1 bg-teal-500 hover:bg-teal-600 text-white text-sm font-medium py-2 rounded-lg transition-colors disabled:opacity-50"
-            >
-              Submit
-            </button>
-            <button
-              onClick={() => setShowAdd(false)}
-              className="flex-1 border border-stone-200 text-stone-600 text-sm py-2 rounded-lg hover:bg-stone-50 transition-colors"
-            >
-              Cancel
-            </button>
+            <button onClick={proposeRule} disabled={loading || !newRule.trim()} style={{ flex: 1, background: c.accent, color: '#fff', border: 'none', cursor: 'pointer', borderRadius: '8px', padding: '9px', fontSize: '13px', fontWeight: 600, opacity: loading || !newRule.trim() ? 0.5 : 1 }}>Submit</button>
+            <button onClick={() => setShowAdd(false)} style={{ flex: 1, background: c.surfaceHover, color: c.textMuted, border: 'none', cursor: 'pointer', borderRadius: '8px', padding: '9px', fontSize: '13px' }}>Cancel</button>
           </div>
         </div>
       )}
 
       {approvedRules.length === 0 && pendingRules.length === 0 && !showAdd && (
-        <div className="text-center py-12 text-stone-400 text-sm">No rules yet. Propose one!</div>
+        <div className="text-center py-12 text-sm" style={{ color: c.textDim }}>No rules yet. Propose one!</div>
       )}
 
       {approvedRules.length > 0 && (
@@ -126,16 +88,13 @@ export default function RulesPage() {
           {approvedRules.map(rule => {
             const myRemoveVote = rule.votes_reject.includes(user?.id ?? '')
             return (
-              <div key={rule.id} className="bg-white rounded-xl border border-stone-200 p-4 flex items-start gap-3">
-                <span className="w-2 h-2 rounded-full bg-teal-400 mt-1.5 flex-shrink-0"></span>
+              <div key={rule.id} style={card} className="flex items-start gap-3">
+                <span className="w-2 h-2 rounded-full mt-2 flex-shrink-0" style={{ background: c.accent }} />
                 <div className="flex-1">
-                  <p className="text-sm text-stone-700">{rule.text}</p>
-                  <p className="text-xs text-stone-400 mt-1">Remove: {rule.votes_reject.length}/{members.length} votes needed</p>
+                  <p className="text-sm" style={{ color: c.text }}>{rule.text}</p>
+                  <p className="text-xs mt-1.5" style={{ color: c.textDim }}>Remove: {rule.votes_reject.length}/{members.length} votes needed</p>
                 </div>
-                <button
-                  onClick={() => removeRule(rule)}
-                  className={`text-xs px-2 py-1 rounded-lg font-medium transition-colors ${myRemoveVote ? 'bg-red-100 text-red-500' : 'bg-stone-100 text-stone-400 hover:bg-stone-200'}`}
-                >
+                <button onClick={() => removeVote(rule)} style={{ background: myRemoveVote ? c.dangerBg : c.surfaceHover, color: myRemoveVote ? c.danger : c.textMuted, border: `1px solid ${myRemoveVote ? c.dangerBorder : c.border}`, cursor: 'pointer', borderRadius: '8px', padding: '4px 10px', fontSize: '12px', fontWeight: 600 }}>
                   {myRemoveVote ? 'Voted' : 'Remove'}
                 </button>
               </div>
@@ -146,29 +105,21 @@ export default function RulesPage() {
 
       {pendingRules.length > 0 && (
         <div>
-          <h3 className="text-xs font-semibold uppercase tracking-wide text-stone-400 mb-2">Pending proposals</h3>
+          <p className="text-xs font-semibold uppercase tracking-wide mb-2" style={{ color: c.textDim }}>Pending proposals</p>
           <div className="space-y-2">
             {pendingRules.map(rule => {
               const myApprove = rule.votes_approve.includes(user?.id ?? '')
               const myReject = rule.votes_reject.includes(user?.id ?? '')
               return (
-                <div key={rule.id} className="bg-amber-50 rounded-xl border border-amber-200 p-4">
-                  <p className="text-sm text-stone-700 mb-2">{rule.text}</p>
+                <div key={rule.id} style={{ ...card, border: `1px solid ${c.borderStrong}`, background: c.surfaceHover }}>
+                  <p className="text-sm mb-3" style={{ color: c.text }}>{rule.text}</p>
                   <div className="flex items-center justify-between">
-                    <span className="text-xs text-stone-400">
-                      {rule.votes_approve.length}/{threshold} approvals needed
-                    </span>
+                    <span className="text-xs" style={{ color: c.textMuted }}>{rule.votes_approve.length}/{threshold} approvals needed</span>
                     <div className="flex gap-2">
-                      <button
-                        onClick={() => vote(rule, true)}
-                        className={`text-xs px-2.5 py-1 rounded-lg font-medium transition-colors ${myApprove ? 'bg-teal-500 text-white' : 'bg-stone-100 text-stone-500 hover:bg-teal-100 hover:text-teal-600'}`}
-                      >
+                      <button onClick={() => vote(rule, true)} style={{ background: myApprove ? c.accentBg : c.surfaceHover, color: myApprove ? c.accentText : c.textMuted, border: `1px solid ${myApprove ? c.accent : c.border}`, cursor: 'pointer', borderRadius: '8px', padding: '4px 10px', fontSize: '12px', fontWeight: 600 }}>
                         Approve ({rule.votes_approve.length})
                       </button>
-                      <button
-                        onClick={() => vote(rule, false)}
-                        className={`text-xs px-2.5 py-1 rounded-lg font-medium transition-colors ${myReject ? 'bg-red-400 text-white' : 'bg-stone-100 text-stone-500 hover:bg-red-100 hover:text-red-500'}`}
-                      >
+                      <button onClick={() => vote(rule, false)} style={{ background: myReject ? c.dangerBg : c.surfaceHover, color: myReject ? c.danger : c.textMuted, border: `1px solid ${myReject ? c.dangerBorder : c.border}`, cursor: 'pointer', borderRadius: '8px', padding: '4px 10px', fontSize: '12px', fontWeight: 600 }}>
                         Reject ({rule.votes_reject.length})
                       </button>
                     </div>
