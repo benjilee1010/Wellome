@@ -1,0 +1,22 @@
+name: Supabase keep-alive
+
+# Backup trigger for api/keep-alive.js, independent of Vercel's own cron.
+# Runs daily and just hits the public endpoint, which queries both the
+# Circles and Wellome Supabase projects to prevent free-tier auto-pause.
+on:
+  schedule:
+    - cron: "0 12 * * *"
+  workflow_dispatch: {}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Hit keep-alive endpoint
+        run: |
+          status=$(curl -s -o response.json -w "%{http_code}" https://wellome.vercel.app/api/keep-alive)
+          cat response.json
+          echo "HTTP status: $status"
+          if [ "$status" != "200" ]; then
+            echo "::warning::keep-alive endpoint returned $status"
+          fi
