@@ -152,23 +152,20 @@ export default function BillsPage() {
         const myPaid = payments.filter(p => p.user_id === user?.id && p.paid).reduce((s, p) => s + p.amount, 0)
         const myOwed = payments.filter(p => p.user_id === user?.id && !p.paid).reduce((s, p) => s + p.amount, 0)
         return (
-          <div className="rounded-xl p-4 flex gap-4 text-center" style={{ background: c.accentBg, border: `1px solid ${c.border}` }}>
-            <div className="flex-1">
+          <div className="rounded-xl p-4 grid grid-cols-2 sm:grid-cols-4 gap-4 text-center" style={{ background: c.accentBg, border: `1px solid ${c.border}` }}>
+            <div>
               <p className="text-xs font-medium mb-0.5" style={{ color: c.accentText }}>Total bills</p>
               <p className="text-lg font-bold" style={{ color: c.text }}>${totalCost.toFixed(2)}</p>
             </div>
-            <div className="w-px" style={{ background: c.border }} />
-            <div className="flex-1">
+            <div>
               <p className="text-xs font-medium mb-0.5" style={{ color: c.accentText }}>Per person</p>
               <p className="text-lg font-bold" style={{ color: c.text }}>${perPerson.toFixed(2)}</p>
             </div>
-            <div className="w-px" style={{ background: c.border }} />
-            <div className="flex-1">
+            <div>
               <p className="text-xs font-medium mb-0.5" style={{ color: c.accentText }}>You owe</p>
               <p className="text-lg font-bold" style={{ color: myOwed > 0 ? c.danger : c.text }}>${myOwed.toFixed(2)}</p>
             </div>
-            <div className="w-px" style={{ background: c.border }} />
-            <div className="flex-1">
+            <div>
               <p className="text-xs font-medium mb-0.5" style={{ color: c.accentText }}>You paid</p>
               <p className="text-lg font-bold" style={{ color: c.text }}>${myPaid.toFixed(2)}</p>
             </div>

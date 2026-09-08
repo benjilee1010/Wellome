@@ -297,7 +297,7 @@ export default function ChoresPage() {
   const renderWeek = (weekDays: Date[], label: string) => (
     <div style={{ marginBottom: '20px' }}>
       <p style={{ margin: '0 0 8px', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: c.textDim }}>{label}</p>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '8px' }}>
+      <div className="week-grid">
         {weekDays.map(day => {
           const dayStr = isoDate(day)
           const dayChores = chores.filter(ch => ch.week_start === dayStr)
@@ -305,13 +305,13 @@ export default function ChoresPage() {
           const isSelected = dayStr === selectedDay
           const assignedUids = [...new Set(dayChores.map(ch => ch.assigned_to).filter(Boolean))] as string[]
           return (
-            <div key={dayStr} onClick={() => setSelectedDay(isSelected ? null : dayStr)} style={{ borderRadius: '12px', border: `1px solid ${isSelected ? c.accent : isToday ? c.accentText : c.border}`, background: isSelected ? c.accentBg : c.surface, cursor: 'pointer', minHeight: '110px', overflow: 'hidden', display: 'flex', flexDirection: 'column', transition: 'border-color 0.15s, background 0.15s' }}>
+            <div key={dayStr} onClick={() => setSelectedDay(isSelected ? null : dayStr)} className="day-cell" style={{ border: `1px solid ${isSelected ? c.accent : isToday ? c.accentText : c.border}`, background: isSelected ? c.accentBg : c.surface }}>
               <div style={{ padding: '7px 9px 4px', fontSize: '12px', fontWeight: isToday ? 800 : 500, color: isToday ? c.accentText : c.textMuted, display: 'flex', justifyContent: 'space-between' }}>
                 <span>{day.getDate()}</span>
                 {day.getDate() === 1 && <span style={{ fontSize: '10px', color: c.textDim }}>{day.toLocaleDateString('en-US', { month: 'short' })}</span>}
               </div>
               {assignedUids.length > 0 && (
-                <div style={{ display: 'flex', flex: 1, margin: '0 6px 6px', gap: '3px' }}>
+                <div className="day-cell-boxes">
                   {assignedUids.map(uid => {
                     const userChores = dayChores.filter(ch => ch.assigned_to === uid)
                     const openChores = userChores.filter(ch => !ch.completed)
@@ -340,13 +340,13 @@ export default function ChoresPage() {
   )
 
   return (
-    <div style={{ display: 'flex', gap: '28px', alignItems: 'flex-start' }}>
+    <div className="chores-shell">
 
       {/* ── Calendar + detail ─────────────────────────────────────────────── */}
-      <div style={{ flex: 1 }}>
+      <div style={{ flex: 1, minWidth: 0, width: '100%' }}>
         {/* Top bar */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '8px', flex: 1, marginRight: '12px' }}>
+        <div className="chores-topbar">
+          <div className="week-label-grid">
             {DAY_LABELS.map(d => (
               <div key={d} style={{ textAlign: 'center', fontSize: '11px', fontWeight: 700, color: c.textDim, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{d}</div>
             ))}
@@ -418,7 +418,7 @@ export default function ChoresPage() {
       </div>
 
       {/* ── Sidebar ───────────────────────────────────────────────────────── */}
-      <div style={{ width: '170px', flexShrink: 0, paddingTop: '36px' }}>
+      <div className="chores-sidebar">
         <p style={{ margin: '0 0 10px', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: c.textDim }}>Members</p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '24px' }}>
           {members.map((m, idx) => {

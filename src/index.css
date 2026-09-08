@@ -14,3 +14,76 @@ select option {
   background: var(--surface, #ffffff);
   color: var(--text, #1a1a2e);
 }
+
+/* ── Chores page responsive layout ──────────────────────────────────────── */
+.chores-shell {
+  display: flex;
+  gap: 28px;
+  align-items: flex-start;
+}
+.chores-sidebar {
+  width: 170px;
+  flex-shrink: 0;
+  padding-top: 36px;
+}
+.chores-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.week-label-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  flex: 1;
+  margin-right: 12px;
+}
+.week-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+}
+.day-cell {
+  border-radius: 12px;
+  cursor: pointer;
+  min-height: 110px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: border-color 0.15s, background 0.15s;
+}
+.day-cell-boxes {
+  display: flex;
+  flex: 1;
+  margin: 0 6px 6px;
+  gap: 3px;
+}
+
+@media (max-width: 720px) {
+  .chores-shell {
+    flex-direction: column;
+    gap: 20px;
+  }
+  .chores-sidebar {
+    width: 100%;
+    padding-top: 0;
+  }
+  .chores-topbar {
+    flex-wrap: wrap;
+    row-gap: 8px;
+  }
+  .week-label-grid {
+    margin-right: 0;
+  }
+  .week-grid {
+    gap: 4px;
+  }
+  .day-cell {
+    min-height: 60px;
+    border-radius: 9px;
+  }
+  .day-cell-boxes {
+    margin: 0 3px 3px;
+  }
+}

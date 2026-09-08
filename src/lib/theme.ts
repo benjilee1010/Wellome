@@ -19,11 +19,11 @@ export const lightColors = {
 }
 
 export const darkColors = {
-  bg: '#2c2c30',
-  surface: '#35353a',
-  surfaceHover: '#3e3e44',
-  border: '#4a4a51',
-  borderStrong: '#5c5c64',
+  bg: '#232327',
+  surface: '#2c2c31',
+  surfaceHover: '#35353b',
+  border: '#424249',
+  borderStrong: '#54545c',
   text: '#e6e6e8',
   textMuted: '#b3b3ba',
   textDim: '#8c8c94',
