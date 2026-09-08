@@ -21,6 +21,8 @@ export interface Bill {
   name: string
   month: string
   total_amount: number
+  is_template: boolean
+  template_id: string | null
   created_by: string
   created_at: string
 }

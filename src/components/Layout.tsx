@@ -1,5 +1,5 @@
 import { type ReactNode } from 'react'
-import { c } from '../lib/theme'
+import { useTheme } from '../context/ThemeContext'
 
 interface Props {
   children: ReactNode
@@ -16,6 +16,7 @@ const TABS = [
 ]
 
 export default function Layout({ children, tab, setTab, houseName }: Props) {
+  const { c } = useTheme()
   return (
     <div className="min-h-screen flex flex-col" style={{ background: c.bg }}>
 

@@ -6,11 +6,11 @@ body {
   margin: 0;
   font-family: system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
-  background: #f5f5fa;
-  color: #1a1a2e;
+  background: var(--bg, #f5f5fa);
+  color: var(--text, #1a1a2e);
 }
 
 select option {
-  background: #ffffff;
-  color: #1a1a2e;
+  background: var(--surface, #ffffff);
+  color: var(--text, #1a1a2e);
 }

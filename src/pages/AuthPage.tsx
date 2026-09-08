@@ -1,8 +1,11 @@
 import { useState } from 'react'
 import { supabase } from '../lib/supabase'
-import { c, inputStyle } from '../lib/theme'
+import { inputStyleFor } from '../lib/theme'
+import { useTheme } from '../context/ThemeContext'
 
 export default function AuthPage() {
+  const { c } = useTheme()
+  const inputStyle = inputStyleFor(c)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isSignUp, setIsSignUp] = useState(false)

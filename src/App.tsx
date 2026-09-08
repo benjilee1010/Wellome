@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { HouseProvider, useHouse } from './context/HouseContext'
+import { ThemeProvider, useTheme } from './context/ThemeContext'
 import AuthPage from './pages/AuthPage'
 import OnboardingPage from './pages/OnboardingPage'
 import BillsPage from './pages/BillsPage'
@@ -8,7 +9,6 @@ import RulesPage from './pages/RulesPage'
 import ChoresPage from './pages/ChoresPage'
 import SettingsPage from './pages/SettingsPage'
 import Layout from './components/Layout'
-import { c } from './lib/theme'
 
 const PAGE_TITLES: Record<string, string> = {
   bills: 'Bills',
@@ -20,6 +20,7 @@ const PAGE_TITLES: Record<string, string> = {
 function AppInner() {
   const { user, loading: authLoading } = useAuth()
   const { house, loading: houseLoading } = useHouse()
+  const { c } = useTheme()
   const [tab, setTab] = useState(() => localStorage.getItem('activeTab') ?? 'bills')
 
   const handleSetTab = (t: string) => {
@@ -53,10 +54,12 @@ function AppInner() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <HouseProvider>
-        <AppInner />
-      </HouseProvider>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <HouseProvider>
+          <AppInner />
+        </HouseProvider>
+      </AuthProvider>
+    </ThemeProvider>
   )
 }

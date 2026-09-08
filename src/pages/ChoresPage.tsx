@@ -3,7 +3,8 @@ import { supabase } from '../lib/supabase'
 import { useHouse } from '../context/HouseContext'
 import { useAuth } from '../context/AuthContext'
 import { type Chore } from '../lib/types'
-import { c, inputStyle } from '../lib/theme'
+import { inputStyleFor } from '../lib/theme'
+import { useTheme } from '../context/ThemeContext'
 
 // ─── helpers ─────────────────────────────────────────────────────────────────
 function isoDate(d: Date) { return d.toISOString().split('T')[0] }
@@ -44,6 +45,8 @@ function saveColors(cols: Record<string,string>) {
 export default function ChoresPage() {
   const { house, members } = useHouse()
   const { user } = useAuth()
+  const { c } = useTheme()
+  const inputStyle = inputStyleFor(c)
 
   const [chores, setChores] = useState<Chore[]>([])
   const [templates, setTemplates] = useState<Chore[]>([])

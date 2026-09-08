@@ -2,11 +2,16 @@ import { useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useHouse } from '../context/HouseContext'
 import { useAuth } from '../context/AuthContext'
-import { c, card, inputStyle } from '../lib/theme'
+import { useTheme } from '../context/ThemeContext'
+import { cardStyle, inputStyleFor } from '../lib/theme'
 
 export default function SettingsPage() {
   const { house, members, refresh } = useHouse()
   const { user, signOut } = useAuth()
+  const { mode, c, setMode } = useTheme()
+  const card = cardStyle(c)
+  const inputStyle = inputStyleFor(c)
+  const isOwner = user?.id === house?.created_by
   const [copied, setCopied] = useState(false)
   const [removing, setRemoving] = useState<string | null>(null)
   const [editingName, setEditingName] = useState(false)
@@ -100,13 +105,30 @@ export default function SettingsPage() {
                   </p>
                 </div>
               </div>
-              {m.user_id !== user?.id && (
+              {isOwner && m.user_id !== user?.id && (
                 <button onClick={() => removeMember(m.id)} disabled={removing === m.id} style={{ color: c.textDim, background: 'none', border: 'none', cursor: 'pointer', fontSize: '12px', opacity: removing === m.id ? 0.5 : 1 }}>
                   Remove
                 </button>
               )}
             </div>
           ))}
+        </div>
+      </div>
+
+      {/* Appearance */}
+      <div style={card}>
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-sm font-semibold" style={{ color: c.textMuted }}>Appearance</h3>
+            <p className="text-xs mt-0.5" style={{ color: c.textDim }}>Dark mode</p>
+          </div>
+          <button
+            onClick={() => setMode(mode === 'dark' ? 'light' : 'dark')}
+            title={mode === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+            style={{ width: '44px', height: '26px', borderRadius: '13px', border: 'none', cursor: 'pointer', position: 'relative', flexShrink: 0, background: mode === 'dark' ? c.accent : c.border, transition: 'background 0.2s' }}
+          >
+            <span style={{ position: 'absolute', top: '3px', width: '20px', height: '20px', borderRadius: '50%', background: '#fff', transition: 'left 0.2s', left: mode === 'dark' ? '21px' : '3px' }} />
+          </button>
         </div>
       </div>
 

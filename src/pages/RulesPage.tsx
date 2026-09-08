@@ -2,12 +2,16 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useHouse } from '../context/HouseContext'
 import { useAuth } from '../context/AuthContext'
+import { useTheme } from '../context/ThemeContext'
 import { type HouseRule } from '../lib/types'
-import { c, card, inputStyle } from '../lib/theme'
+import { cardStyle, inputStyleFor } from '../lib/theme'
 
 export default function RulesPage() {
   const { house, members } = useHouse()
   const { user } = useAuth()
+  const { c } = useTheme()
+  const card = cardStyle(c)
+  const inputStyle = inputStyleFor(c)
   const [rules, setRules] = useState<HouseRule[]>([])
   const [showAdd, setShowAdd] = useState(false)
   const [newRule, setNewRule] = useState('')
@@ -28,31 +32,23 @@ export default function RulesPage() {
     setNewRule(''); setShowAdd(false); setLoading(false); load()
   }
 
+  // These cast votes via Postgres RPCs (see
+  // supabase_migration_rule_vote_functions.sql) instead of reading the vote
+  // arrays into JS and writing them back -- a plain read-modify-write here
+  // let two near-simultaneous votes silently overwrite each other.
   const vote = async (rule: HouseRule, approve: boolean) => {
     if (!user) return
-    const uid = user.id
-    let votesApprove = rule.votes_approve.filter(v => v !== uid)
-    let votesReject = rule.votes_reject.filter(v => v !== uid)
-    if (approve) votesApprove = [...votesApprove, uid]
-    else votesReject = [...votesReject, uid]
-    const threshold = Math.ceil(members.length * 0.75)
-    let status: 'pending' | 'approved' | 'rejected' = 'pending'
-    if (votesApprove.length >= threshold) status = 'approved'
-    else if (votesReject.length > members.length - threshold) status = 'rejected'
-    await supabase.from('house_rules').update({ votes_approve: votesApprove, votes_reject: votesReject, status }).eq('id', rule.id)
+    await supabase.rpc('cast_rule_vote', {
+      p_rule_id: rule.id, p_user_id: user.id, p_approve: approve, p_member_count: members.length,
+    })
     load()
   }
 
   const removeVote = async (rule: HouseRule) => {
     if (!user) return
-    const uid = user.id
-    const votesApprove = rule.votes_approve.filter(v => v !== uid)
-    const votesReject = [...rule.votes_reject.filter(v => v !== uid), uid]
-    if (votesReject.length >= members.length) {
-      await supabase.from('house_rules').delete().eq('id', rule.id)
-    } else {
-      await supabase.from('house_rules').update({ votes_approve: votesApprove, votes_reject: votesReject }).eq('id', rule.id)
-    }
+    await supabase.rpc('cast_rule_removal_vote', {
+      p_rule_id: rule.id, p_user_id: user.id, p_member_count: members.length,
+    })
     load()
   }
 
