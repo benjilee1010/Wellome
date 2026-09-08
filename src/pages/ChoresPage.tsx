@@ -68,6 +68,8 @@ export default function ChoresPage() {
   const [newAutoFreq, setNewAutoFreq] = useState(1)
   const [newAutoDuration, setNewAutoDuration] = useState(15)
   const [savingAuto, setSavingAuto] = useState(false)
+  const [editingFreqId, setEditingFreqId] = useState<string | null>(null)
+  const loadInFlight = useRef(false)
 
   const today = startOfDay(new Date())
   const week1Start = getMonday(today)
@@ -129,6 +131,17 @@ export default function ChoresPage() {
   // ── load ─────────────────────────────────────────────────────────────────
   const load = async () => {
     if (!house || !members.length) return
+    if (loadInFlight.current) return
+    loadInFlight.current = true
+    try {
+      await generateInstances()
+    } finally {
+      loadInFlight.current = false
+    }
+  }
+
+  const generateInstances = async () => {
+    if (!house) return
     const tmpls = await fetchTemplates()
     setTemplates(tmpls)
     const existing = await fetchChores()
@@ -157,7 +170,9 @@ export default function ChoresPage() {
       }
     }
 
-    if (toInsert.length) await supabase.from('chores').insert(toInsert)
+    if (toInsert.length) {
+      await supabase.from('chores').upsert(toInsert, { onConflict: 'template_id,week_start', ignoreDuplicates: true })
+    }
     setChores(await fetchChores())
   }
 
@@ -195,6 +210,19 @@ export default function ChoresPage() {
         .eq('template_id', tmpl.id).eq('completed', false)
         .gte('week_start', isoDate(today))
     }
+    await load()
+  }
+
+  // ── edit template frequency ───────────────────────────────────────────────
+  const updateTemplateFrequency = async (tmpl: Chore, days: number) => {
+    setEditingFreqId(null)
+    if (days === tmpl.frequency_days) return
+    await supabase.from('chores').update({ frequency_days: days }).eq('id', tmpl.id)
+    // Future incomplete instances were scheduled off the old cadence; clear them so
+    // load() regenerates the schedule from today using the new frequency.
+    await supabase.from('chores').delete()
+      .eq('template_id', tmpl.id).eq('completed', false)
+      .gte('week_start', isoDate(today))
     await load()
   }
 
@@ -454,31 +482,56 @@ export default function ChoresPage() {
               {templates.length === 0 && (
                 <p style={{ color: c.textDim, fontSize: '13px', margin: 0 }}>No auto-assigned chores yet. Add one below.</p>
               )}
-              {templates.map(tmpl => (
-                <div key={tmpl.id} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 14px', background: c.surfaceHover, borderRadius: '10px', opacity: tmpl.is_active === false ? 0.5 : 1 }}>
-                  <div style={{ flex: 1 }}>
-                    <p style={{ margin: 0, fontSize: '14px', fontWeight: 600, color: c.text }}>{tmpl.name}</p>
-                    <p style={{ margin: '2px 0 0', fontSize: '11px', color: c.textDim }}>{freqLabel(tmpl.frequency_days)} · {tmpl.duration_minutes}min</p>
+              {templates.map(tmpl => {
+                const isEditingFreq = editingFreqId === tmpl.id
+                return (
+                <div key={tmpl.id} style={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: '12px 14px', background: c.surfaceHover, borderRadius: '10px', opacity: tmpl.is_active === false ? 0.5 : 1 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p style={{ margin: 0, fontSize: '14px', fontWeight: 600, color: c.text }}>{tmpl.name}</p>
+                      <button
+                        onClick={() => setEditingFreqId(isEditingFreq ? null : tmpl.id)}
+                        title="Edit frequency"
+                        style={{ margin: '2px 0 0', padding: 0, background: 'none', border: 'none', cursor: 'pointer', fontSize: '11px', color: c.textDim, textDecoration: 'underline', textDecorationStyle: 'dotted', textUnderlineOffset: '2px' }}
+                      >
+                        {freqLabel(tmpl.frequency_days)} · {tmpl.duration_minutes}min
+                      </button>
+                    </div>
+
+                    {/* Toggle on/off */}
+                    <button
+                      onClick={() => toggleTemplate(tmpl)}
+                      title={tmpl.is_active === false ? 'Turn on' : 'Pause'}
+                      style={{
+                        width: '38px', height: '22px', borderRadius: '11px', border: 'none', cursor: 'pointer', position: 'relative', flexShrink: 0,
+                        background: tmpl.is_active === false ? c.border : c.accent, transition: 'background 0.2s',
+                      }}
+                    >
+                      <span style={{
+                        position: 'absolute', top: '3px', width: '16px', height: '16px', borderRadius: '50%', background: '#fff', transition: 'left 0.2s',
+                        left: tmpl.is_active === false ? '3px' : '19px',
+                      }} />
+                    </button>
+
+                    <button onClick={() => deleteTemplate(tmpl)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: c.textDim, fontSize: '13px', padding: '0 2px' }}>Delete</button>
                   </div>
 
-                  {/* Toggle on/off */}
-                  <button
-                    onClick={() => toggleTemplate(tmpl)}
-                    title={tmpl.is_active === false ? 'Turn on' : 'Pause'}
-                    style={{
-                      width: '38px', height: '22px', borderRadius: '11px', border: 'none', cursor: 'pointer', position: 'relative', flexShrink: 0,
-                      background: tmpl.is_active === false ? c.border : c.accent, transition: 'background 0.2s',
-                    }}
-                  >
-                    <span style={{
-                      position: 'absolute', top: '3px', width: '16px', height: '16px', borderRadius: '50%', background: '#fff', transition: 'left 0.2s',
-                      left: tmpl.is_active === false ? '3px' : '19px',
-                    }} />
-                  </button>
-
-                  <button onClick={() => deleteTemplate(tmpl)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: c.textDim, fontSize: '13px', padding: '0 2px' }}>Delete</button>
+                  {isEditingFreq && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
+                      {FREQ_OPTIONS.map(opt => (
+                        <button
+                          key={opt.val}
+                          onClick={() => updateTemplateFrequency(tmpl, opt.val)}
+                          style={{ padding: '5px 10px', fontSize: '12px', fontWeight: 600, border: `1px solid ${tmpl.frequency_days === opt.val ? c.accent : c.border}`, borderRadius: '8px', cursor: 'pointer', background: tmpl.frequency_days === opt.val ? c.accentBg : c.surface, color: tmpl.frequency_days === opt.val ? c.accentText : c.textMuted }}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              ))}
+                )
+              })}
             </div>
 
             {/* Add new template */}
