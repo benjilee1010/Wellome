@@ -283,15 +283,16 @@ export default function ChoresPage() {
                 <div style={{ display: 'flex', flex: 1, margin: '0 6px 6px', gap: '3px' }}>
                   {assignedUids.map(uid => {
                     const userChores = dayChores.filter(ch => ch.assigned_to === uid)
-                    const allDone = userChores.every(ch => ch.completed)
+                    const openChores = userChores.filter(ch => !ch.completed)
+                    const allDone = openChores.length === 0
                     const color = getMemberColor(uid)
                     const member = members.find(m => m.user_id === uid)
                     return (
-                      <div key={uid} title={`${member?.display_name}${userChores.length > 1 ? ` (${userChores.length} chores)` : ''}`} style={{ flex: 1, borderRadius: '6px', background: allDone ? c.border : color, opacity: allDone ? 0.5 : 1, minHeight: '36px', overflow: 'hidden', position: 'relative', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', paddingBottom: '3px' }}>
-                        {userChores.length > 1 && Array.from({ length: userChores.length - 1 }).map((_, li) => (
+                      <div key={uid} title={`${member?.display_name}${openChores.length > 1 ? ` (${openChores.length} chores)` : ''}`} style={{ flex: 1, borderRadius: '6px', background: allDone ? c.border : color, opacity: allDone ? 0.5 : 1, minHeight: '36px', overflow: 'hidden', position: 'relative', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', paddingBottom: '3px' }}>
+                        {openChores.length > 1 && Array.from({ length: openChores.length - 1 }).map((_, li) => (
                           <div
                             key={li}
-                            style={{ position: 'absolute', left: 0, right: 0, height: '1px', background: 'rgba(255,255,255,0.5)', top: `${((li + 1) / userChores.length) * 100}%` }}
+                            style={{ position: 'absolute', left: 0, right: 0, height: '1px', background: 'rgba(255,255,255,0.5)', top: `${((li + 1) / openChores.length) * 100}%` }}
                           />
                         ))}
                         {!allDone && <span style={{ fontSize: '9px', color: 'rgba(255,255,255,0.8)', fontWeight: 700 }}>{member?.display_name?.[0]}</span>}
