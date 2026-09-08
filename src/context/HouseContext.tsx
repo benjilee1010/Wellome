@@ -57,7 +57,8 @@ export function HouseProvider({ children }: { children: ReactNode }) {
     }
 
     load()
-  }, [user, tick])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, tick])
 
   const myMember = members.find(m => m.user_id === user?.id) ?? null
 

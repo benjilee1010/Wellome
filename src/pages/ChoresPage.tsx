@@ -115,7 +115,7 @@ export default function ChoresPage() {
 
   // Build chore boxes for a day cell: group by assigned_to, count per person
   function buildDayBoxes(weekStart: string) {
-    const weekChores = chores.filter(c => c.week_start === weekStart)
+    const weekChores = chores.filter(c => c.week_start === weekStart && !c.completed)
     const byMember: Record<string, { count: number; color: string; initial: string }> = {}
     for (const c of weekChores) {
       const uid = c.assigned_to ?? 'group'
