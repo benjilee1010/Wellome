@@ -8,11 +8,12 @@ import RulesPage from './pages/RulesPage'
 import ChoresPage from './pages/ChoresPage'
 import SettingsPage from './pages/SettingsPage'
 import Layout from './components/Layout'
+import { c } from './lib/theme'
 
 const PAGE_TITLES: Record<string, string> = {
   bills: 'Bills',
-  rules: 'House Rules',
   chores: 'Chores',
+  rules: 'House Rules',
   settings: 'Settings',
 }
 
@@ -28,8 +29,8 @@ function AppInner() {
 
   if (authLoading || houseLoading) {
     return (
-      <div className="min-h-screen bg-stone-50 flex items-center justify-center">
-        <div className="text-stone-400 text-sm">Loading…</div>
+      <div className="min-h-screen flex items-center justify-center" style={{ background: c.bg }}>
+        <div className="text-sm" style={{ color: c.textDim }}>Loading…</div>
       </div>
     )
   }
@@ -38,14 +39,13 @@ function AppInner() {
   if (!house) return <OnboardingPage />
 
   return (
-    <Layout tab={tab} setTab={handleSetTab}>
-      <div className="mb-5">
-        <p className="text-xs font-semibold uppercase tracking-widest text-stone-400 mb-0.5">{house.name}</p>
-        <h1 className="text-2xl font-bold text-stone-800">{PAGE_TITLES[tab]}</h1>
+    <Layout tab={tab} setTab={handleSetTab} houseName={house.name}>
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold" style={{ color: c.text }}>{PAGE_TITLES[tab]}</h1>
       </div>
       {tab === 'bills' && <BillsPage />}
-      {tab === 'rules' && <RulesPage />}
       {tab === 'chores' && <ChoresPage />}
+      {tab === 'rules' && <RulesPage />}
       {tab === 'settings' && <SettingsPage />}
     </Layout>
   )

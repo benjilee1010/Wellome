@@ -19,7 +19,7 @@ export interface Bill {
   id: string
   house_id: string
   name: string
-  month: string // YYYY-MM
+  month: string
   total_amount: number
   created_by: string
   created_at: string
@@ -51,7 +51,11 @@ export interface Chore {
   name: string
   duration_minutes: number
   chore_type: 'individual' | 'group' | 'recurring'
-  week_start: string // ISO date of Monday
+  week_start: string          // used as the specific chore date (YYYY-MM-DD)
+  frequency_days: number      // 0 = one-time, 1 = daily, 7 = weekly, etc.
+  is_template: boolean        // true = recurring template
+  template_id: string | null  // instance's parent template
+  is_active: boolean          // false = paused, no new instances generated
   assigned_to: string | null
   completed: boolean
   completed_at: string | null
