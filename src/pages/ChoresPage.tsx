@@ -362,11 +362,11 @@ export default function ChoresPage() {
         {/* Day detail */}
         {selectedDay && (
           <div style={{ marginTop: '4px', background: c.surface, border: `1px solid ${c.border}`, borderRadius: '14px', padding: '18px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px', marginBottom: '14px' }}>
               <h3 style={{ margin: 0, fontSize: '15px', fontWeight: 700, color: c.text }}>
                 {new Date(selectedDay + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
               </h3>
-              <button onClick={() => setShowAddForm(true)} style={btnPrimary}>+ Add one-time chore</button>
+              <button onClick={() => setShowAddForm(true)} style={{ ...btnPrimary, whiteSpace: 'nowrap' }}>+ Add chore</button>
             </div>
 
             {selectedDayChores.length === 0 && !showAddForm && (
