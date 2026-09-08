@@ -21,7 +21,7 @@ export default function Layout({ children, tab, setTab, houseName }: Props) {
     <div className="min-h-screen flex flex-col" style={{ background: c.bg }}>
 
       {/* Top header */}
-      <header className="flex items-center justify-between px-8 py-4 border-b" style={{ borderColor: c.border, background: c.surface }}>
+      <header className="flex items-center justify-between px-8 py-4 border-b" style={{ borderColor: c.border, background: c.bg }}>
         <div className="flex items-center" style={{ gap: '2px' }}>
           <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ borderRadius: '7px', flexShrink: 0 }}>
             <rect width="28" height="28" rx="7" fill="#6366f1"/>
